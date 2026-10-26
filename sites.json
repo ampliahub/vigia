@@ -1,0 +1,10 @@
+[
+  { "nome": "Coolify (painel)", "url": "https://coolify.ampliahub.com.br/api/health", "espera": "OK" },
+  { "nome": "Don Capo", "url": "https://doncapo.ampliahub.com.br/api/versao", "espera": "versao" },
+  { "nome": "Grade de Horário", "url": "https://gradedehorario.ampliahub.com.br/api/versao", "espera": "versao" },
+  { "nome": "Nadi", "url": "https://nadi.ampliahub.com.br/api/versao", "espera": "versao" },
+  { "nome": "Nexus", "url": "https://nexus.ampliahub.com.br/api/versao", "espera": "versao" },
+  { "nome": "SC Torta&CIA", "url": "https://sc.ampliahub.com.br/api/versao", "espera": "versao" },
+  { "nome": "Site AmpliaHub", "url": "https://ampliahub.com.br/api/versao", "espera": "versao" },
+  { "nome": "Site Don Capo", "url": "https://doncapo.com.br/api/versao", "espera": "versao" }
+]

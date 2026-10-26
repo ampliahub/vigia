@@ -1,0 +1,65 @@
+name: Vigiar os sites
+
+# Confere a cada 10 minutos se os sites de produção da AmpliaHub respondem e
+# manda e-mail quando um cai e quando volta. Detalhes em vigiar.mjs.
+#
+# Repositório público de propósito: no plano gratuito, rotina em repositório
+# público não gasta os 2.000 minutos/mês da organização (a cada 10 min seriam
+# ~4.500). Chave e e-mails ficam nos segredos, que não aparecem pra ninguém.
+#
+# O GitHub pode atrasar rotinas agendadas em alguns minutos quando está cheio.
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+    - cron: "0 12 1 * *" # dia 1 de cada mês: mantém a rotina ligada (ver abaixo)
+  workflow_dispatch:
+    inputs:
+      teste:
+        description: "Só mandar um e-mail de teste"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write # gravar o estado.json
+  actions: write # religar a própria rotina todo mês
+
+concurrency:
+  group: vigia
+  cancel-in-progress: false
+
+jobs:
+  vigiar:
+    if: github.event.schedule != '0 12 1 * *'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Conferir os sites
+        run: node vigiar.mjs
+        env:
+          VIGIA_TESTE: ${{ inputs.teste }}
+          HOSTINGER_API_TOKEN: ${{ secrets.HOSTINGER_API_TOKEN }}
+          HOSTINGER_MAILBOX_RESOURCE_ID: ${{ secrets.HOSTINGER_MAILBOX_RESOURCE_ID }}
+          VIGIA_DESTINOS: ${{ secrets.VIGIA_DESTINOS }}
+      - name: Gravar o estado se mudou
+        run: |
+          if ! git diff --quiet estado.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add estado.json
+            git commit -m "Estado dos sites: $(date -u +%Y-%m-%dT%H:%MZ)"
+            git push
+          fi
+
+  # O GitHub desliga rotina agendada de repositório público sem movimento há
+  # 60 dias. Uma vez por mês a rotina se religa pela API pra não cair nessa.
+  manter-ligada:
+    if: github.event.schedule == '0 12 1 * *'
+    runs-on: ubuntu-latest
+    steps:
+      - run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/vigiar.yml/enable"
+        env:
+          GH_TOKEN: ${{ github.token }}
