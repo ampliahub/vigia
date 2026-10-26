@@ -10,8 +10,8 @@ name: Vigiar os sites
 # O GitHub pode atrasar rotinas agendadas em alguns minutos quando está cheio.
 on:
   schedule:
-    - cron: "*/10 * * * *"
-    - cron: "0 12 1 * *" # dia 1 de cada mês: mantém a rotina ligada (ver abaixo)
+    - cron: "3-59/10 * * * *" # minutos 3, 13, 23...: o GitHub atrasa ou descarta rodadas no minuto cheio
+    - cron: "17 12 1 * *" # dia 1 de cada mês: mantém a rotina ligada (ver abaixo)
   workflow_dispatch:
     inputs:
       teste:
@@ -29,7 +29,7 @@ concurrency:
 
 jobs:
   vigiar:
-    if: github.event.schedule != '0 12 1 * *'
+    if: github.event.schedule != '17 12 1 * *'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -57,7 +57,7 @@ jobs:
   # O GitHub desliga rotina agendada de repositório público sem movimento há
   # 60 dias. Uma vez por mês a rotina se religa pela API pra não cair nessa.
   manter-ligada:
-    if: github.event.schedule == '0 12 1 * *'
+    if: github.event.schedule == '17 12 1 * *'
     runs-on: ubuntu-latest
     steps:
       - run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/vigiar.yml/enable"
