@@ -6,5 +6,6 @@
   { "nome": "Nexus", "url": "https://nexus.ampliahub.com.br/api/versao", "espera": "versao" },
   { "nome": "SC Torta&CIA", "url": "https://sc.ampliahub.com.br/api/versao", "espera": "versao" },
   { "nome": "Site AmpliaHub", "url": "https://ampliahub.com.br/api/versao", "espera": "versao" },
-  { "nome": "Site Don Capo", "url": "https://doncapo.com.br/api/versao", "espera": "versao" }
+  { "nome": "Site Don Capo", "url": "https://doncapo.com.br/api/versao", "espera": "versao" },
+  { "nome": "Soma", "url": "https://soma.ampliahub.com.br/api/versao", "espera": "versao" }
 ]
