@@ -1,0 +1,12 @@
+// Vigia na Cloudflare: roda a cada 3 minutos nos servidores da Cloudflare,
+// fora do GitHub e fora da Hostinger. Publicar: npx wrangler deploy (nesta pasta).
+{
+  "name": "vigia-ampliahub",
+  "main": "vigia.js",
+  "compatibility_date": "2026-10-01",
+  "workers_dev": false,
+  "triggers": { "crons": ["*/3 * * * *"] },
+  // Quem está fora e desde quando. Só é gravado quando muda.
+  "kv_namespaces": [{ "binding": "VIGIA_ESTADO", "id": "f82d226a8ab746eab9f1fd0304dcca98" }],
+  "observability": { "enabled": true }
+}

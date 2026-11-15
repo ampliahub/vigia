@@ -1,17 +1,9 @@
-name: Vigiar os sites
+name: Vigiar os sites (reserva manual)
 
-# Confere a cada 10 minutos se os sites de produção da AmpliaHub respondem e
-# manda e-mail quando um cai e quando volta. Detalhes em vigiar.mjs.
-#
-# Repositório público de propósito: no plano gratuito, rotina em repositório
-# público não gasta os 2.000 minutos/mês da organização (a cada 10 min seriam
-# ~4.500). Chave e e-mails ficam nos segredos, que não aparecem pra ninguém.
-#
-# O GitHub pode atrasar rotinas agendadas em alguns minutos quando está cheio.
+# Desde 15/11/2026 o Vigia roda na Cloudflare a cada 3 minutos (pasta cloudflare/).
+# Aqui ficou só o disparo manual, pra teste ou se a Cloudflare parar.
+# O agendamento foi tirado pra não chegar aviso em dobro.
 on:
-  schedule:
-    - cron: "3-59/10 * * * *" # minutos 3, 13, 23...: o GitHub atrasa ou descarta rodadas no minuto cheio
-    - cron: "17 12 1 * *" # dia 1 de cada mês: mantém a rotina ligada (ver abaixo)
   workflow_dispatch:
     inputs:
       teste:
@@ -21,7 +13,6 @@ on:
 
 permissions:
   contents: write # gravar o estado.json
-  actions: write # religar a própria rotina todo mês
 
 concurrency:
   group: vigia
@@ -29,7 +20,6 @@ concurrency:
 
 jobs:
   vigiar:
-    if: github.event.schedule != '17 12 1 * *'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -53,13 +43,3 @@ jobs:
             git commit -m "Estado dos sites: $(date -u +%Y-%m-%dT%H:%MZ)"
             git push
           fi
-
-  # O GitHub desliga rotina agendada de repositório público sem movimento há
-  # 60 dias. Uma vez por mês a rotina se religa pela API pra não cair nessa.
-  manter-ligada:
-    if: github.event.schedule == '17 12 1 * *'
-    runs-on: ubuntu-latest
-    steps:
-      - run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/vigiar.yml/enable"
-        env:
-          GH_TOKEN: ${{ github.token }}
